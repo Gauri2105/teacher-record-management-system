@@ -49,5 +49,8 @@ Teacher Management: Add, update, and delete teacher profiles.
 Search Functionality: Use filters to quickly find specific records.
 
 ### screenshots
+![TRMS-Add-Teachers-1536x852](https://github.com/user-attachments/assets/42c4866e-b170-4327-9ff8-0be5456a8b51)
+![TRMS-Admin-Dashboard-1536x714](https://github.com/user-attachments/assets/7161214b-352a-495a-be53-91d5074d6c45)
+![TRMS-Admin-Login-1536x714](https://github.com/user-attachments/assets/2c2e64aa-5472-4698-9eb9-f27fe527572e)
 
 
