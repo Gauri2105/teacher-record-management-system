@@ -1,66 +1,35 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy PHP app to Azure Web App - newdemowebapp
+name: Build and Deploy to Azure App Service
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # Trigger the action on changes to the 'main' branch
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
+    - name: Set up Node.js environment (if needed)
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16' # Adjust according to your app's Node.js version
 
-      - name: Check if composer.json exists
-        id: check_files
-        uses: andstor/file-existence-action@v1
-        with:
-          files: 'composer.json'
+    - name: Install Dependencies
+      run: |
+        npm install
 
-      - name: Run composer install if composer.json exists
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
+    - name: Build the Project
+      run: |
+        npm run build
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: '<your-app-service-name>'  # Azure App Service name
+        slot-name: 'production'  # Change if using slots
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: php-app
-          path: release.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: php-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-      
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'newdemowebapp'
-          slot-name: 'Production'
-          package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC0398A67E62496C940D612D88FD70C2 }}
